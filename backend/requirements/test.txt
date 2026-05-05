@@ -1,0 +1,39 @@
+"""Test requirements for backend."""
+Django==4.2.11
+djangorestframework==3.14.0
+django-filter==24.1
+django-cors-headers==4.3.1
+psycopg2-binary==2.9.9
+python-decouple==3.8
+cryptography==42.0.5
+
+# Testing
+pytest==7.4.4
+pytest-django==4.7.0
+pytest-cov==4.1.0
+pytest-asyncio==0.23.3
+factory-boy==3.3.0
+faker==22.6.0
+
+# Code quality
+black==24.2.0
+flake8==7.0.0
+isort==5.13.2
+pylint==3.0.3
+mypy==1.8.0
+django-stubs==4.2.7
+djangorestframework-stubs==3.14.4
+
+# Security
+bandit==1.7.5
+safety==2.3.5
+
+# Coverage
+coverage==7.4.1
+
+# API testing
+requests==2.31.0
+responses==0.24.1
+
+# Utilities
+python-dotenv==1.0.0
