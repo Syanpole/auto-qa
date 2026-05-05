@@ -173,3 +173,60 @@ def stats(request):
             "pass_rate_percent": round(pass_rate, 2),
         }
     )
+
+
+# ==================== Model Management Endpoints ====================
+
+@api_view(["GET"])
+def list_models(request):
+    """List all registered inference models."""
+    from .model_loader import ModelLoaderService
+    models = ModelLoaderService.list_available_models()
+    return Response({"models": models})
+
+
+@api_view(["GET"])
+def get_active_model(request):
+    """Get the currently active production model."""
+    from .model_loader import ModelLoaderService
+    active_model = ModelLoaderService.get_active_model()
+    if not active_model:
+        return Response({"error": "No active model"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({
+        "model_id": str(active_model.id),
+        "model_name": active_model.name,
+        "file_path": active_model.file_path,
+        "confidence_threshold": float(active_model.confidence_threshold),
+        "iou_threshold": float(active_model.iou_threshold),
+        "version": active_model.version,
+        "architecture": active_model.architecture,
+        "is_active": active_model.is_active,
+    })
+
+
+@api_view(["POST"])
+def activate_model(request):
+    """Activate a registered model for production inference."""
+    if not request.user.is_staff:
+        raise PermissionDenied("Only staff can activate models.")
+    
+    model_name = request.data.get("model_name")
+    if not model_name:
+        raise ValidationError("model_name is required.")
+    
+    try:
+        from .model_loader import ModelLoaderService
+        result = ModelLoaderService.activate_model(model_name)
+        
+        log_event(
+            user=request.user,
+            action_type="model_activated",
+            target_object=model_name,
+            metadata={"model_name": model_name},
+            request=request
+        )
+        
+        return Response(result, status=status.HTTP_200_OK)
+    except ValueError as e:
+        raise ValidationError(str(e))
+

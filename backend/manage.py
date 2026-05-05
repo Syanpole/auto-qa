@@ -4,7 +4,9 @@ import sys
 
 
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.prod")
+    app_env = os.getenv("APP_ENV", "development").lower()
+    settings_module = "config.settings.prod" if app_env == "production" else "config.settings.dev"
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
     from django.core.management import execute_from_command_line
     execute_from_command_line(sys.argv)
 

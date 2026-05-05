@@ -29,3 +29,6 @@ CHANNEL_LAYERS = {
 		},
 	}
 }
+
+# Local ML service for development runs on the standalone FastAPI server.
+ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://localhost:8001")

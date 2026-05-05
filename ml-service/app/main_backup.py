@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 import uvicorn
 
 from .yolo_model_manager import YOLOModelManager
@@ -18,18 +17,6 @@ app = FastAPI(
     description="Production-grade YOLO inference engine for IC defect detection",
     version="2.0.0"
 )
-
-# Request models
-class ModelLoadRequest(BaseModel):
-    """Request body for loading a model."""
-    model_path: str
-    model_name: str = None
-
-
-class ModelActivateRequest(BaseModel):
-    """Request body for activating a model."""
-    model_name: str
-
 
 # Initialize model manager
 manager = YOLOModelManager()
@@ -47,7 +34,7 @@ async def startup_event():
     model_path = os.getenv('PRODUCTION_MODEL_PATH')
     if not model_path:
         # Default location relative to workspace
-        default_path = Path(__file__).parent.parent.parent / \
+        default_path = Path(__file__).parent.parent.parent.parent / \
                       "backend" / "models_registry" / "deployed_models" / "tpcyolov26nv21gs.pt"
         if default_path.exists():
             model_path = str(default_path)
@@ -162,7 +149,7 @@ async def stream_infer(file: UploadFile = File(...)):
 # ==================== Model Management Endpoints ====================
 
 @app.post("/v1/models/load")
-def load_model(request: ModelLoadRequest) -> dict:
+def load_model(model_path: str, model_name: str = None) -> dict:
     """
     Load a model from file.
     
@@ -171,8 +158,8 @@ def load_model(request: ModelLoadRequest) -> dict:
         model_name: Custom name for the model
     """
     try:
-        logger.info(f"Loading model from {request.model_path}")
-        result = manager.load_model(request.model_path, request.model_name)
+        logger.info(f"Loading model from {model_path}")
+        result = manager.load_model(model_path, model_name)
         return result
     except Exception as e:
         logger.error(f"Model loading failed: {str(e)}")
@@ -180,12 +167,12 @@ def load_model(request: ModelLoadRequest) -> dict:
 
 
 @app.post("/v1/models/activate")
-def activate_model(request: ModelActivateRequest) -> dict:
+def activate_model(model_name: str) -> dict:
     """Activate a model for inference."""
-    result = manager.activate_model(request.model_name)
+    result = manager.activate_model(model_name)
     if not result:
-        raise HTTPException(status_code=404, detail=f"Model {request.model_name} not found")
-    return {"status": "activated", "model": request.model_name}
+        raise HTTPException(status_code=404, detail=f"Model {model_name} not found")
+    return {"status": "activated", "model": model_name}
 
 
 @app.post("/v1/models/deactivate")

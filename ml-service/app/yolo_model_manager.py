@@ -323,10 +323,13 @@ class YOLOModelManager:
             return None
         
         model = self.models[model_name]
+        class_names = model.names or []
+        if isinstance(class_names, dict):
+            class_names = [class_names[key] for key in sorted(class_names)]
         return ModelInfoResponse(
             model_name=model_name,
             is_active=model_name == self.active_model,
-            class_names=model.names or [],
+            class_names=class_names,
             input_shape=[640, 640, 3],
             device="GPU" if self.gpu_available else "CPU"
         )
