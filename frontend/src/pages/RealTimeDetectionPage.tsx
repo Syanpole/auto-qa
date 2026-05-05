@@ -50,7 +50,7 @@ export default function RealTimeDetectionPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const inferenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const inferenceTimerRef = useRef<number | null>(null);
 
   // Station and product data
   const stations = ['Station-A', 'Station-B', 'Station-C'];
