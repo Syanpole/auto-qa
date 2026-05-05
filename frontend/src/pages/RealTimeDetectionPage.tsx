@@ -173,7 +173,7 @@ export default function RealTimeDetectionPage() {
   };
 
   const drawDetections = (detections: DetectionResult[]) => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !videoRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -181,7 +181,7 @@ export default function RealTimeDetectionPage() {
 
     // Clear previous drawings
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(videoRef.current!, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     // Draw bounding boxes
     detections.forEach((detection, index) => {
@@ -367,7 +367,7 @@ export default function RealTimeDetectionPage() {
                 )}
 
                 {/* Inference Time */}
-                {liveInference && (
+                {liveInference && liveInference.inference_time_ms !== undefined && (
                   <div className="absolute bottom-4 right-4 bg-black/70 text-gray-200 px-3 py-2 rounded-lg text-sm font-mono">
                     {liveInference.inference_time_ms.toFixed(1)}ms
                   </div>
@@ -378,10 +378,10 @@ export default function RealTimeDetectionPage() {
               {liveInference && (
                 <div className="bg-slate-700/50 border-t border-slate-600 p-4">
                   <div className="flex items-center justify-between">
-                    <div className={`flex items-center gap-3 ${getStatusColor(liveInference.pass_fail_status)}`}>
-                      {getStatusIcon(liveInference.pass_fail_status)}
+                    <div className={`flex items-center gap-3 ${getStatusColor(liveInference.pass_fail_status || 'UNKNOWN')}`}>
+                      {getStatusIcon(liveInference.pass_fail_status || 'UNKNOWN')}
                       <div>
-                        <p className="text-sm font-semibold">Status: {liveInference.pass_fail_status}</p>
+                        <p className="text-sm font-semibold">Status: {liveInference.pass_fail_status || 'UNKNOWN'}</p>
                         <p className="text-xs text-gray-300">{liveInference.timestamp}</p>
                       </div>
                     </div>
