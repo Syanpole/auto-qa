@@ -1,12 +1,28 @@
 from .models import ModelAccess, ModelRegistry, StationModelAssignment
+from apps.qa.models import QAStation, ProductProfile
 
 
-def resolve_station_model(station_id: str, product_id: str):
-    return (
-        StationModelAssignment.objects.select_related("model")
-        .filter(station_id=station_id, product_id=product_id, is_active=True, model__is_active=True)
-        .first()
-    )
+def resolve_station_model(station_code: str, product_code: str):
+    """
+    Resolve the active model assigned to a station-product combination.
+    
+    Args:
+        station_code: Station code (e.g., 'Station-A')
+        product_code: Product code (e.g., 'IC_001')
+    
+    Returns:
+        StationModelAssignment instance or None
+    """
+    try:
+        station = QAStation.objects.get(station_code=station_code)
+        product = ProductProfile.objects.get(product_code=product_code)
+        return (
+            StationModelAssignment.objects.select_related("model")
+            .filter(station=station, product=product, is_active=True, model__is_active=True)
+            .first()
+        )
+    except (QAStation.DoesNotExist, ProductProfile.DoesNotExist):
+        return None
 
 
 def user_can_access_model(user, model: ModelRegistry) -> bool:

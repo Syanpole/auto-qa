@@ -55,16 +55,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "autoqa"),
-        "USER": os.getenv("POSTGRES_USER", "autoqa"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "autoqa"),
-        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
-    }
-}
+# Database configuration is defined in environment-specific settings (dev.py, prod.py, etc.)
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

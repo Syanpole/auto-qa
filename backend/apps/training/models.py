@@ -5,6 +5,10 @@ from apps.common.models import TimeStampedModel
 from apps.qa.models import QAStation, ProductProfile
 
 
+def default_input_shape():
+    return {"height": 640, "width": 640}
+
+
 class AIModel(TimeStampedModel):
     """
     Comprehensive YOLO model registry with full lifecycle tracking.
@@ -58,7 +62,7 @@ class AIModel(TimeStampedModel):
     # Metadata
     framework = models.CharField(max_length=40, default="ultralytics", help_text="Framework used (ultralytics, etc)")
     model_size_mb = models.FloatField(default=0.0, help_text="Model file size in MB")
-    input_shape = models.JSONField(default=lambda: {"height": 640, "width": 640}, help_text="Expected input dimensions")
+    input_shape = models.JSONField(default=default_input_shape, help_text="Expected input dimensions")
     
     # Performance metrics
     metrics_json = models.JSONField(
